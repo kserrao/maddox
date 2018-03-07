@@ -3,6 +3,7 @@ from Card import Card, Suit, Rank
 from Player import Player
 from Trick import Trick
 from random import randint
+from Maddox import Maddox
 
 '''
 Change auto to False if you would like to play the game manually.
@@ -37,7 +38,7 @@ class Hearts:
 
 		# Make four players
 
-		self.players = [Player("Danny"), Player("Desmond"), Player("Ben"), Player("Tyler")]
+		self.players = [Maddox("Maddox"), Player("Desmond"), Player("Ben"), Player("Tyler")]
 
 		'''
 		Player physical locations:

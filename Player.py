@@ -1,7 +1,7 @@
 from Hand import Hand
 
 class Player:
-	def __init__(self, name, auto=False):
+	def __init__(self, name):
 			self.name = name
 			self.hand = Hand()
 			self.score = 0
