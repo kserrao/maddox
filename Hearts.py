@@ -4,6 +4,7 @@ from Player import Player
 from Trick import Trick
 from random import randint
 from Maddox import Maddox
+from Felicity import Felicity
 
 '''
 Change auto to False if you would like to play the game manually.
@@ -38,7 +39,7 @@ class Hearts:
 
 		# Make four players
 
-		self.players = [Maddox("Maddox"), Player("Desmond"), Player("Ben"), Player("Tyler")]
+		self.players = [Felicity(""), Maddox(""), Player("Dumb"), Player("Dumber")]
 
 		'''
 		Player physical locations:
@@ -218,7 +219,7 @@ class Hearts:
 					# player tries to play off suit but has trick suit
 					if addCard is not None and addCard.suit != self.currentTrick.suit:
 						if curPlayer.hasSuit(self.currentTrick.suit):
-							print "Must play the suit of the current trick."
+							#print "Must play the suit of the current trick."
 							addCard = None
 						elif addCard.suit == Suit(hearts):
 							self.heartsBroken = True
@@ -226,7 +227,7 @@ class Hearts:
 					if self.trickNum == 0:
 						if addCard is not None:
 							if addCard.suit == Suit(hearts):
-								print "Hearts cannot be broken on the first hand."
+								#print "Hearts cannot be broken on the first hand."
 								self.heartsBroken = False
 								addCard = None
 							elif addCard.suit == Suit(spades) and addCard.rank == Rank(queen):
@@ -285,30 +286,31 @@ class Hearts:
 
 
 def main():
-	hearts = Hearts()
+    wins = {"Maddox" : 0, "Felicity" : 0, "Dumb" : 0, "Dumber" : 0}
+    for i in range(100):
+        hearts = Hearts()
 
-	# play until someone loses
-	while hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
-		while hearts.trickNum < totalTricks:
-			print "Round", hearts.roundNum
-			if hearts.trickNum == 0:
-				hearts.playersPassCards()
-				hearts.getFirstTrickStarter()
-			print '\nPlaying trick number', hearts.trickNum + 1
-			hearts.playTrick(hearts.trickWinner)
-		hearts.roundScore()
-		# tally scores
-		hearts.handleScoring()
+        # play until someone loses
+        while hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
+        	while hearts.trickNum < totalTricks:
+        		print "Round", hearts.roundNum
+        		if hearts.trickNum == 0:
+        			hearts.playersPassCards()
+        			hearts.getFirstTrickStarter()
+        		print '\nPlaying trick number', hearts.trickNum + 1
+        		hearts.playTrick(hearts.trickWinner)
+        	hearts.roundScore()
+        	# tally scores
+        	hearts.handleScoring()
 
-		# new round if no one has lost
-		if hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
-			print "New round"
-			hearts.newRound()
+        	# new round if no one has lost
+        	if hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
+        		print "New round"
+        		hearts.newRound()
 
-	print # spacing
-	print hearts.getWinner().name, "wins!"
-
-
+        wins[hearts.getWinner().name] += 1
+    print
+    print "Maddox: " + str(wins["Maddox"]) + "\nFelicity: " + str(wins["Felicity"]) + "\nDumb: " + str(wins["Dumb"]) + "\nDumber: " + str(wins["Dumber"])
 
 if __name__ == '__main__':
 	main()

@@ -19,12 +19,12 @@ class Player:
 		return card
 
 	def play(self, option='play', c=None, auto=False):
-		if auto:
+		if not c is None:
+			return self.hand.playCard(c)
+		elif auto:
 			card = self.hand.getRandomCard()
-		elif c is None:
-			card = self.getInput(option)
 		else:
-			card = c
+			card = self.getInput(option)
 		if not auto:
 			card = self.hand.playCard(card)
 		return card

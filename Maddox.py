@@ -9,3 +9,8 @@ class Maddox(Player):
         self.score = 0
         self.roundScore = 0
         self.tricksWon = []
+
+    def play(self, option='play', c=None, auto=False):
+        if not c is None:
+            return self.hand.playCard(c)
+        return self.hand.getRandomCard()
