@@ -36,6 +36,8 @@ class Player:
 	def add26(self):
 		self.score += 26
 
+	def subtract26(self):
+		self.score -= 26
 
 	def hasSuit(self, suit):
 		return len(self.hand.hand[suit.iden]) > 0

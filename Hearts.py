@@ -2,6 +2,7 @@ from Deck import Deck
 from Card import Card, Suit, Rank
 from Player import Player
 from Trick import Trick
+from random import randint
 
 '''
 Change auto to False if you would like to play the game manually.
@@ -10,7 +11,7 @@ When auto is True, passing is disabled and the computer plays the
 game by "guess and check", randomly trying moves until it finds a
 valid one.
 '''
-auto = False
+auto = True
 
 totalTricks = 13
 maxScore = 100
@@ -32,7 +33,6 @@ class Hearts:
 		self.heartsBroken = False
 		self.losingPlayer = None
 		self.passingCards = [[], [], [], []]
-		self.shot = False
 
 
 		# Make four players
@@ -108,10 +108,23 @@ class Hearts:
 				p.score += p.roundScore
 
 	def shootTheMoon(self, player):
-		self.shot = True
-		for p in self.players:
-			if (p != player):
-				p.add26()
+		if (auto):
+			r = randint(0,1)
+			if r:
+				for p in self.players:
+					if (p != player):
+						p.add26()
+			else:
+				player.subtract26()
+		else:
+			inp = raw_input(self.name + ", do you want to add or subtract")
+			if (inp == "add"):
+				for p in self.players:
+					if (p != player):
+						p.add26()
+			else:
+				player.subtract26()
+
 
 	def passCards(self, index):
 		print self.printPassingCards()
@@ -120,7 +133,7 @@ class Hearts:
 		while len(self.passingCards[passTo]) < cardsToPass: # pass three cards
 			passCard = None
 			while passCard is None: # make sure string passed is valid
-				passCard = self.players[index].play(option='pass')
+				passCard = self.players[index].play(option='pass', auto=auto)
 				if passCard is not None:
 					# remove card from player hand and add to passed cards
 					self.passingCards[passTo].append(passCard)
@@ -278,8 +291,7 @@ def main():
 		while hearts.trickNum < totalTricks:
 			print "Round", hearts.roundNum
 			if hearts.trickNum == 0:
-				if not auto:
-					hearts.playersPassCards()
+				hearts.playersPassCards()
 				hearts.getFirstTrickStarter()
 			print '\nPlaying trick number', hearts.trickNum + 1
 			hearts.playTrick(hearts.trickWinner)
@@ -288,13 +300,11 @@ def main():
 		hearts.handleScoring()
 
 		# new round if no one has lost
-		if hearts.losingPlayer.score < maxScore:
+		if hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
 			print "New round"
 			hearts.newRound()
 
 	print # spacing
-	if (hearts.shot):
-		print "Someone shot!"
 	print hearts.getWinner().name, "wins!"
 
 
