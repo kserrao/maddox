@@ -36,7 +36,7 @@ class Hand:
 		elif card.suit == Suit(hearts):
 			self.hearts.append(card)
 		else:
-			print 'Invalid card'
+			print( 'Invalid card')
 
 		if self.size() == 13:
 			for suit in self.hand:
@@ -66,7 +66,7 @@ class Hand:
 		try:
 			suitIden = suits.index(suit)
 		except:
-			print 'Invalid suit'
+			print( 'Invalid suit')
 			return None
 
 		cardRank = card[0:len(card)-1] # get rank from string
@@ -89,7 +89,7 @@ class Hand:
 			try:
 				cardRank = int(cardRank)
 			except:
-				print "Invalid card rank."
+				print( "Invalid card rank.")
 				return None
 
 		return cardRank, suitIden
@@ -129,8 +129,8 @@ class Hand:
 				self.updateHand()
 
 	def hasOnlyHearts(self):
-		print "len(self.hearts):",len(self.hearts)
-		print "self.size():",self.size()
+		# print "len(self.hearts):",len(self.hearts)
+		# print "self.size():",self.size()
 		return len(self.hearts) == self.size()
 
 

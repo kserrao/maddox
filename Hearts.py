@@ -56,9 +56,9 @@ class Hearts:
 
 	def handleScoring(self):
 		p, highestScore = None, 0
-		print "\nScores:\n"
+		# print "\nScores:\n"
 		for player in self.players:
-			print player.name + ": " + str(player.score)
+			# print player.name + ": " + str(player.score)
 			if player.score > highestScore:
 				p = player
 				highestScore = player.score
@@ -97,10 +97,10 @@ class Hearts:
 		p = self.players[self.trickWinner]
 		p.trickWon(self.currentTrick)
 		self.printCurrentTrick()
-		print p.name + " won the trick."
+		# print p.name + " won the trick."
 		# print 'Making new trick'
 		self.currentTrick = Trick()
-		print self.currentTrick.suit
+		# print self.currentTrick.suit
 
 	def roundScore(self):
 		for p in self.players:
@@ -129,13 +129,13 @@ class Hearts:
 
 
 	def passCards(self, index):
-		print self.printPassingCards()
+		# print self.printPassingCards()
 		passTo = self.passes[self.trickNum] # how far to pass cards
 		passTo = (index + passTo) % len(self.players) # the index to which cards are passed
 		while len(self.passingCards[passTo]) < cardsToPass: # pass three cards
 			passCard = None
 			while passCard is None: # make sure string passed is valid
-				passCard = self.players[index].play(option='pass', auto=auto)
+				passCard = self.players[index].play(option='pass', auto=auto, state=self)
 				if passCard is not None:
 					# remove card from player hand and add to passed cards
 					self.passingCards[passTo].append(passCard)
@@ -164,7 +164,7 @@ class Hearts:
 		self.printPlayers()
 		if not self.trickNum % 4 == 3: # don't pass every fourth hand
 			for i in range(0, len(self.players)):
-				print # spacing
+				# print # spacing
 				self.printPlayer(i)
 				self.passCards(i % len(self.players))
 
@@ -175,7 +175,7 @@ class Hearts:
 		shift = 0
 		if self.trickNum == 0:
 			startPlayer = self.players[start]
-			addCard = startPlayer.play(option="play", c='2c')
+			addCard = startPlayer.play(option="play", c='2c', state=self)
 			startPlayer.removeCard(addCard)
 
 			self.currentTrick.addCard(addCard, start)
@@ -192,7 +192,7 @@ class Hearts:
 
 			while addCard is None: # wait until a valid card is passed
 
-				addCard = curPlayer.play(auto=auto) # change auto to False to play manually
+				addCard = curPlayer.play(auto=auto, state=self) # change auto to False to play manually
 
 
 				# the rules for what cards can be played
@@ -207,9 +207,9 @@ class Hearts:
 							# if player only has hearts but hearts have not been broken,
 							# player can play hearts
 							if not curPlayer.hasOnlyHearts():
-								print curPlayer.hasOnlyHearts()
-								print curPlayer.hand.__str__()
-								print "Hearts have not been broken."
+								# print curPlayer.hasOnlyHearts()
+								# print curPlayer.hand.__str__()
+								# print "Hearts have not been broken."
 								addCard = None
 							else:
 								self.currentTrick.setTrickSuit(addCard)
@@ -231,12 +231,12 @@ class Hearts:
 								self.heartsBroken = False
 								addCard = None
 							elif addCard.suit == Suit(spades) and addCard.rank == Rank(queen):
-								print "The queen of spades cannot be played on the first hand."
+								# print "The queen of spades cannot be played on the first hand."
 								addCard = None
 
 					if addCard is not None and self.currentTrick.suit == Suit(noSuit):
 						if addCard.suit == Suit(hearts) and not self.heartsBroken:
-							print "Hearts not yet broken."
+							# print "Hearts not yet broken."
 							addCard = None
 
 
@@ -255,12 +255,13 @@ class Hearts:
 	# print player's hand
 	def printPlayer(self, i):
 		p = self.players[i]
-		print p.name + "'s hand: " + str(p.hand)
+		# print p.name + "'s hand: " + str(p.hand)
 
 	# print all players' hands
 	def printPlayers(self):
-		for p in self.players:
-			print p.name + ": " + str(p.hand)
+		pass
+	# 	for p in self.players:
+	# 		# print p.name + ": " + str(p.hand)
 
 	# show cards played in current trick
 	def printCurrentTrick(self):
@@ -271,7 +272,7 @@ class Hearts:
 				trickStr += self.players[i].name + ": " + str(card) + "\n"
 			else:
 				trickStr += self.players[i].name + ": None\n"
-		print trickStr
+		# print trickStr
 
 	def getWinner(self):
 		minScore = 200 # impossibly high
@@ -287,17 +288,17 @@ class Hearts:
 
 def main():
     wins = {"Maddox" : 0, "Felicity" : 0, "Dumb" : 0, "Dumber" : 0}
-    for i in range(100):
+    for i in range(1000):
         hearts = Hearts()
 
         # play until someone loses
         while hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
         	while hearts.trickNum < totalTricks:
-        		print "Round", hearts.roundNum
+        		# print "Round", hearts.roundNum
         		if hearts.trickNum == 0:
         			hearts.playersPassCards()
         			hearts.getFirstTrickStarter()
-        		print '\nPlaying trick number', hearts.trickNum + 1
+        		# print '\nPlaying trick number', hearts.trickNum + 1
         		hearts.playTrick(hearts.trickWinner)
         	hearts.roundScore()
         	# tally scores
@@ -305,12 +306,12 @@ def main():
 
         	# new round if no one has lost
         	if hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
-        		print "New round"
+        		# print "New round"
         		hearts.newRound()
 
         wins[hearts.getWinner().name] += 1
     print
-    print "Maddox: " + str(wins["Maddox"]) + "\nFelicity: " + str(wins["Felicity"]) + "\nDumb: " + str(wins["Dumb"]) + "\nDumber: " + str(wins["Dumber"])
+    print("Maddox: " + str(wins["Maddox"]) + "\nFelicity: " + str(wins["Felicity"]) + "\nDumb: " + str(wins["Dumb"]) + "\nDumber: " + str(wins["Dumber"]))
 
 if __name__ == '__main__':
 	main()

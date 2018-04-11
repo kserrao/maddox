@@ -10,7 +10,7 @@ class Felicity(Player):
         self.roundScore = 0
         self.tricksWon = []
 
-    def play(self, option='play', c=None, auto=False):
+    def play(self, option='play', c=None, auto=False, state=None):
         if not c is None:
             return self.hand.playCard(c)
         return self.hand.getRandomCard()

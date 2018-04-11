@@ -18,15 +18,13 @@ class Player:
 			card = raw_input(self.name + ", select a card to " + option + ": ")
 		return card
 
-	def play(self, option='play', c=None, auto=False):
+	def play(self, option='play', c=None, auto=False, state=None):
 		if not c is None:
 			return self.hand.playCard(c)
 		elif auto:
 			card = self.hand.getRandomCard()
 		else:
 			card = self.getInput(option)
-		if not auto:
-			card = self.hand.playCard(card)
 		return card
 
 

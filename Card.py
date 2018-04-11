@@ -50,7 +50,7 @@ class Suit:
 		elif iden <= 3:
 			self.string = suits[iden]
 		else:
-			print 'Invalid card identifier'
+			print( 'Invalid card identifier')
 
 	def __eq__(self, other):
 		return self.iden == other.iden
@@ -91,7 +91,7 @@ class Rank:
 		elif rank > 10 and rank <= 14:
 			self.string = strings[rank - 11]
 		else:
-			print 'Invalid rank identifier'
+			print("Invalid rank identifier")
 
 	def __lt__(self, other):
 		return self.rank < other.rank
@@ -113,5 +113,3 @@ class Rank:
 
 	def __str__(self):
 		return self.string
-
-
