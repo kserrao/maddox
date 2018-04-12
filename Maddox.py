@@ -57,26 +57,18 @@ class Maddox(Player):
 				max_min_list[3*i + 2] = self.hand.hand[i][-1].rank.rank
 		s[0] = [trump, max_trump] + max_min_list
 		a,allQ = self.Q.run([predict,Qout],feed_dict={inputs1:s})
-
+		for i in range(4):
+			if len(self.hand.hand[i]) == 0 or (len(self.hand.hand[trump]) > 0 and i != trump and trump != -1):
+				allQ[0][3*i] = -1
+				allQ[0][3*i + 1] = -1
+				allQ[0][3*i + 2] = -1
+			# else:
+			# 	allQ[0][3*i] += 1000
+			# 	allQ[0][3*i + 1] += 1000
+			# 	allQ[0][3*i + 2] += 1000
 		for i in range(len(allQ[0])):
-			if (len(self.hand.hand[i // 3]) > 0 and (len(self.hand.hand[trump]) == 0 or i // 3 == trump)) and (i // 3 != 3 or state.heartsBroken):
+			if allQ[0][i] > allQ[0][a[0]]:
 				a[0] = i
-		for i in range(len(allQ[0])):
-			if (len(self.hand.hand[i // 3]) > 0 and (len(self.hand.hand[trump]) == 0 or i // 3 == trump)) and (i // 3 != 3 or state.heartsBroken):
-				if allQ[0][i] > allQ[0][a[0]]:
-				 		a[0] = i
-		# for i in range(4):
-		# 	if len(self.hand.hand[i]) == 0 or (len(self.hand.hand[trump]) > 0 and i != trump and trump != -1):
-		# 		allQ[0][3*i] = -1
-		# 		allQ[0][3*i + 1] = -1
-		# 		allQ[0][3*i + 2] = -1
-		# 	# else:
-		# 	# 	allQ[0][3*i] += 1000
-		# 	# 	allQ[0][3*i + 1] += 1000
-		# 	# 	allQ[0][3*i + 2] += 1000
-		# for i in range(len(allQ[0])):
-		# 	if allQ[0][i] > allQ[0][a[0]]:
-		# 		a[0] = i
 		self.allQ = allQ
 		suit = a[0] // 3
 		index = 0
