@@ -5,7 +5,7 @@ from Trick import Trick
 from random import randint
 from Maddox import Maddox
 from Felicity import Felicity
-
+from Hand import Hand
 '''
 Change auto to False if you would like to play the game manually.
 This allows you to make all passes, and plays for all four players.
@@ -24,7 +24,7 @@ hearts = 3
 cardsToPass = 3
 
 class Hearts:
-	def __init__(self):
+	def __init__(self, maddox):
 
 		self.roundNum = 0
 		self.trickNum = 0 # initialization value such that first round is round 0
@@ -39,8 +39,11 @@ class Hearts:
 
 		# Make four players
 
-		self.players = [Felicity(""), Maddox(""), Player("Dumb"), Player("Dumber")]
-
+		self.players = [Felicity(""), maddox, Player("Dumb"), Player("Dumber")]
+		self.players[1].hand = Hand()
+		self.players[1].score = 0
+		self.players[1].roundScore = 0
+		self.players[1].tricksWon = []
 		'''
 		Player physical locations:
 		Game runs clockwise
@@ -58,7 +61,7 @@ class Hearts:
 		p, highestScore = None, 0
 		# print "\nScores:\n"
 		for player in self.players:
-			# print player.name + ": " + str(player.score)
+			# print(player.name + ": " + str(player.score))
 			if player.score > highestScore:
 				p = player
 				highestScore = player.score
@@ -96,6 +99,9 @@ class Hearts:
 		self.trickWinner = self.currentTrick.winner
 		p = self.players[self.trickWinner]
 		p.trickWon(self.currentTrick)
+		for p in self.players:
+			if p.name == "Maddox":
+				p.eval(self)
 		self.printCurrentTrick()
 		# print p.name + " won the trick."
 		# print 'Making new trick'
@@ -108,6 +114,8 @@ class Hearts:
 				self.shootTheMoon(p)
 			else:
 				p.score += p.roundScore
+			# if p.name == "Maddox":
+			# 	p.eval(self)
 
 	def shootTheMoon(self, player):
 		if (auto):
@@ -287,31 +295,34 @@ class Hearts:
 
 
 def main():
-    wins = {"Maddox" : 0, "Felicity" : 0, "Dumb" : 0, "Dumber" : 0}
-    for i in range(1000):
-        hearts = Hearts()
+	wins = {"Maddox" : 0, "Felicity" : 0, "Dumb" : 0, "Dumber" : 0}
+	maddox = Maddox("")
+	for i in range(1000):
+		hearts = Hearts(maddox)
 
         # play until someone loses
-        while hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
-        	while hearts.trickNum < totalTricks:
+		while hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
+			while hearts.trickNum < totalTricks:
         		# print "Round", hearts.roundNum
-        		if hearts.trickNum == 0:
-        			hearts.playersPassCards()
-        			hearts.getFirstTrickStarter()
-        		# print '\nPlaying trick number', hearts.trickNum + 1
-        		hearts.playTrick(hearts.trickWinner)
-        	hearts.roundScore()
-        	# tally scores
-        	hearts.handleScoring()
+				if hearts.trickNum == 0:
+					hearts.playersPassCards()
+					hearts.getFirstTrickStarter()
+				# print '\nPlaying trick number', hearts.trickNum + 1
+				hearts.playTrick(hearts.trickWinner)
+			hearts.roundScore()
+			# tally scores
+			hearts.handleScoring()
 
-        	# new round if no one has lost
-        	if hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
+			# new round if no one has lost
+			if hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
         		# print "New round"
-        		hearts.newRound()
+				hearts.newRound()
 
-        wins[hearts.getWinner().name] += 1
-    print
-    print("Maddox: " + str(wins["Maddox"]) + "\nFelicity: " + str(wins["Felicity"]) + "\nDumb: " + str(wins["Dumb"]) + "\nDumber: " + str(wins["Dumber"]))
+		wins[hearts.getWinner().name] += 1
+		# print(maddox.tricksplayed)
+		if (i % 100 == 99):
+			print("\n")
+			print("Maddox: " + str(wins["Maddox"]) + "\nFelicity: " + str(wins["Felicity"]) + "\nDumb: " + str(wins["Dumb"]) + "\nDumber: " + str(wins["Dumber"]))
 
 if __name__ == '__main__':
 	main()
