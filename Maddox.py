@@ -5,17 +5,19 @@ import numpy as np
 import random
 import tensorflow as tf
 tf.reset_default_graph()
+n_s = 14
+n_a = 13
 #
 #These lines establish the feed-forward part of the network used to choose actions
-inputs1 = tf.placeholder(shape=[1,14],dtype=tf.float32)
-W = tf.Variable(tf.random_uniform([14,12],0,0.01))
+inputs1 = tf.placeholder(shape=[1,n_s],dtype=tf.float32)
+W = tf.Variable(tf.random_uniform([n_s,n_a],0,0.01))
 Qout = tf.matmul(inputs1,W)
 predict = tf.argmax(Qout,1)
 
 #Below we obtain the loss by taking the sum of squares difference between the target and prediction Q values.
-nextQ = tf.placeholder(shape=[1,12],dtype=tf.float32)
+nextQ = tf.placeholder(shape=[1,n_a],dtype=tf.float32)
 loss = tf.reduce_sum(tf.square(nextQ - Qout))
-trainer = tf.train.GradientDescentOptimizer(learning_rate=0.0002)
+trainer = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
 updateModel = trainer.minimize(loss)
 
 init = tf.initialize_all_variables()
@@ -41,7 +43,7 @@ class Maddox(Player):
 		if not c is None:
 		    return self.hand.playCard(c)
 
-		s = np.zeros((2,14))[0:1]
+		s = np.zeros((2,n_s))[0:1]
 		trump = state.currentTrick.suit.iden
 		max_trump = 0
 		for c in state.currentTrick.trick:
@@ -57,42 +59,71 @@ class Maddox(Player):
 				max_min_list[3*i + 2] = self.hand.hand[i][-1].rank.rank
 		s[0] = [trump, max_trump] + max_min_list
 		a,allQ = self.Q.run([predict,Qout],feed_dict={inputs1:s})
+		tmp = allQ[0][12]
+		allQ[0][12] = -1
+		for c in self.hand.spades:
+			if c.rank.rank == 12:
+				allQ[0][12] = tmp
 		for i in range(4):
 			if len(self.hand.hand[i]) == 0 or (len(self.hand.hand[trump]) > 0 and i != trump and trump != -1):
 				allQ[0][3*i] = -1
 				allQ[0][3*i + 1] = -1
 				allQ[0][3*i + 2] = -1
+				if i == 2:
+					allQ[0][12] = -1
+
 			# else:
 			# 	allQ[0][3*i] += 1000
 			# 	allQ[0][3*i + 1] += 1000
 			# 	allQ[0][3*i + 2] += 1000
+		index = 0
+		suit = 0
 		for i in range(len(allQ[0])):
 			if allQ[0][i] > allQ[0][a[0]]:
 				a[0] = i
 		self.allQ = allQ
-		suit = a[0] // 3
-		index = 0
-		if a[0] % 3 == 1:
-			index = len(self.hand.hand[suit]) // 2
-		elif a[0] % 3 == 0:
-			index = 0
-		else:
-			index = -1
-		# if (self.tricksplayed > 30000):
-		# print(trump)
-		# print(max_trump)
-		# print(a[0])
-		# print(max_min_list)
-		# print(allQ)
-		while np.random.rand(1) < e or len(self.hand.hand[suit]) == 0:
-			a[0] = random.randint(0,11)
+		if (a[0] < 12):
 			suit = a[0] // 3
+			index = 0
 			if a[0] % 3 == 1:
 				index = len(self.hand.hand[suit]) // 2
 			elif a[0] % 3 == 0:
 				index = 0
 			else:
 				index = -1
+		else:
+			suit = 2
+			for i in range(len(self.hand.spades)):
+				if self.hand.spades[i].rank.rank == 12:
+					index = i
+		# if (self.tricksplayed > 30000):
+		# print(trump)
+		# print(max_trump)
+		# print(a[0])
+		# print(max_min_list)
+		# print(allQ)
+		rep = False
+		while np.random.rand(1) < e or len(self.hand.hand[suit]) == 0 or rep:
+			a[0] = random.randint(0,n_a - 1)
+			if rep:
+				a[0] = random.randint(0, n_a - 2)
+			if (a[0] < 12):
+				suit = a[0] // 3
+				index = 0
+				if a[0] % 3 == 1:
+					index = len(self.hand.hand[suit]) // 2
+				elif a[0] % 3 == 0:
+					index = 0
+				else:
+					index = -1
+				rep = False
+			else:
+				rep = True
+				suit = 2
+				for i in range(len(self.hand.spades)):
+					if self.hand.spades[i].rank.rank == 12:
+						index = i
+						rep = False
 		self.lastAction = a[0]
 		return self.hand.hand[suit][index]
 
@@ -115,7 +146,7 @@ class Maddox(Player):
 		# if ((not game.losingPlayer is None) and game.losingPlayer.score >= 100):
 		# 	if game.getWinner().name == "Maddox":
 		# 		r = 100
-		s = np.zeros((2,14))[0:1]
+		s = np.zeros((2,n_s))[0:1]
 		trump = trick.suit.iden
 		max_trump = 0
 		for c in trick.trick:

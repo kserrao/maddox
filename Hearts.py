@@ -6,6 +6,7 @@ from random import randint
 from Maddox import Maddox
 from Felicity import Felicity
 from Hand import Hand
+from Dumb import Dumb
 '''
 Change auto to False if you would like to play the game manually.
 This allows you to make all passes, and plays for all four players.
@@ -39,7 +40,7 @@ class Hearts:
 
 		# Make four players
 
-		self.players = [Felicity(""), maddox, Player("Dumb"), Player("Dumber")]
+		self.players = [Felicity(""), maddox, Dumb("Dumb"), Dumb("Dumber")]
 		self.players[1].hand = Hand()
 		self.players[1].score = 0
 		self.players[1].roundScore = 0
@@ -297,7 +298,7 @@ class Hearts:
 def main():
 	wins = {"Maddox" : 0, "Felicity" : 0, "Dumb" : 0, "Dumber" : 0}
 	maddox = Maddox("")
-	for i in range(1000):
+	for i in range(2000):
 		hearts = Hearts(maddox)
 
         # play until someone loses
