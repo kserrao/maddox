@@ -25,7 +25,7 @@ hearts = 3
 cardsToPass = 3
 
 class Hearts:
-	def __init__(self, maddox):
+	def __init__(self, felicity, maddox):
 
 		self.roundNum = 0
 		self.trickNum = 0 # initialization value such that first round is round 0
@@ -39,12 +39,20 @@ class Hearts:
 
 
 		# Make four players
+		self.players = [felicity, maddox, Dumb("Dumb"), Dumb("Dumber")]
 
-		self.players = [Felicity(""), maddox, Dumb("Dumb"), Dumb("Dumber")]
+		#initialize Felicity
+		self.players[0].hand = Hand()
+		self.players[0].score = 0
+		self.players[0].roundScore = 0
+		self.players[0].tricksWon = []
+
+		#initialize Maddox
 		self.players[1].hand = Hand()
 		self.players[1].score = 0
 		self.players[1].roundScore = 0
 		self.players[1].tricksWon = []
+
 		'''
 		Player physical locations:
 		Game runs clockwise
@@ -296,10 +304,11 @@ class Hearts:
 
 
 def main():
-	wins = {"Maddox" : 0, "Felicity" : 0, "Dumb" : 0, "Dumber" : 0}
+	wins = {"Felicity" : 0, "Dumb" : 0, "Dumber" : 0, "Maddox" : 0}
+	felicity = Felicity("")
 	maddox = Maddox("")
-	for i in range(2000):
-		hearts = Hearts(maddox)
+	for i in range(200):
+		hearts = Hearts(felicity, maddox)
 
         # play until someone loses
 		while hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
@@ -321,7 +330,7 @@ def main():
 
 		wins[hearts.getWinner().name] += 1
 		# print(maddox.tricksplayed)
-		if (i % 100 == 99):
+		if (i % 10 == 9):
 			print("\n")
 			print("Maddox: " + str(wins["Maddox"]) + "\nFelicity: " + str(wins["Felicity"]) + "\nDumb: " + str(wins["Dumb"]) + "\nDumber: " + str(wins["Dumber"]))
 
