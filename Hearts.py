@@ -91,6 +91,7 @@ class Hearts:
 		self.passingCards = [[], [], [], []]
 		for p in self.players:
 			p.discardTricks()
+			print(p.roundScore)
 
 	def getFirstTrickStarter(self):
 		for i,p in enumerate(self.players):

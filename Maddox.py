@@ -5,7 +5,7 @@ import numpy as np
 import random
 import tensorflow as tf
 tf.reset_default_graph()
-n_s = 14
+n_s = 16
 n_a = 13
 #
 #These lines establish the feed-forward part of the network used to choose actions
@@ -39,17 +39,23 @@ class Maddox(Player):
 		self.tricksplayed = 0
 
 	#clubs, diamonds, spades, hearts
+
 	def play(self, option='play', c=None, auto=False, state=None):
 		if not c is None:
 		    return self.hand.playCard(c)
-
+		# initialize
 		s = np.zeros((2,n_s))[0:1]
+
+		# set trump
 		trump = state.currentTrick.suit.iden
+		# set max of trump
 		max_trump = 0
 		for c in state.currentTrick.trick:
 			if (not isinstance(c, int)):
 				if (c.suit.iden == trump):
 					max_trump = max(c.rank.rank, max_trump)
+
+		# set min,med,max of each suit in hand
 		max_min_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		for i in range(4):
 			if len(self.hand.hand[i]) > 0:
@@ -57,25 +63,36 @@ class Maddox(Player):
 				max_min_list[3*i] = self.hand.hand[i][0].rank.rank
 				max_min_list[3*i + 1] = self.hand.hand[i][l//2].rank.rank
 				max_min_list[3*i + 2] = self.hand.hand[i][-1].rank.rank
-		s[0] = [trump, max_trump] + max_min_list
+
+		# concat
+		s[0] = [trump, max_trump] + max_min_list + [state.heartsBroken,
+		 											state.currentTrick.cardsInTrick]
+		# do tf stuff
 		a,allQ = self.Q.run([predict,Qout],feed_dict={inputs1:s})
+
+		# change Q-val to -1 if cant play Qspades
 		tmp = allQ[0][12]
 		allQ[0][12] = -1
 		for c in self.hand.spades:
 			if c.rank.rank == 12:
 				allQ[0][12] = tmp
+
+		# change Q-val to -1 if cant play from a suit
 		for i in range(4):
 			if len(self.hand.hand[i]) == 0 or (len(self.hand.hand[trump]) > 0 and i != trump and trump != -1):
 				allQ[0][3*i] = -1
 				allQ[0][3*i + 1] = -1
 				allQ[0][3*i + 2] = -1
+				# Can't play QSpades
 				if i == 2:
 					allQ[0][12] = -1
+				# Hearts are not broken
+				if i == 3 and not s[0][14]:
+					allQ[0][3*i] = -1
+					allQ[0][3*i + 1] = -1
+					allQ[0][3*i + 2] = -1
 
-			# else:
-			# 	allQ[0][3*i] += 1000
-			# 	allQ[0][3*i + 1] += 1000
-			# 	allQ[0][3*i + 2] += 1000
+		# select chosen card
 		index = 0
 		suit = 0
 		for i in range(len(allQ[0])):
@@ -96,12 +113,15 @@ class Maddox(Player):
 			for i in range(len(self.hand.spades)):
 				if self.hand.spades[i].rank.rank == 12:
 					index = i
-		# if (self.tricksplayed > 30000):
+
+		# # debuggers
 		# print(trump)
 		# print(max_trump)
 		# print(a[0])
 		# print(max_min_list)
 		# print(allQ)
+
+		# noise/fixing problems that probably shouldn't even happen
 		rep = False
 		while np.random.rand(1) < e or len(self.hand.hand[suit]) == 0 or rep:
 			a[0] = random.randint(0,n_a - 1)
@@ -124,28 +144,28 @@ class Maddox(Player):
 					if self.hand.spades[i].rank.rank == 12:
 						index = i
 						rep = False
+		# store action for later
 		self.lastAction = a[0]
+		# play from hand!
 		return self.hand.hand[suit][index]
 
 
 
 
 
-	def eval(self, game):
-		# print(game.losingPlayer)
-		# print(game.losingPlayer.score)
-		trick = game.currentTrick
+	def eval(self, state):
+		trick = state.currentTrick
 
 		self.tricksplayed += 1
 		r = 0
-		if trick.winner == 1:
+		if state.players[trick.winner].name == "Maddox":
 			# if self.roundScore == 26:
 			# 	r = 26
 			# else:
 			r = -trick.points
-		# if ((not game.losingPlayer is None) and game.losingPlayer.score >= 100):
-		# 	if game.getWinner().name == "Maddox":
-		# 		r = 100
+		# if ((not state.losingPlayer is None) and state.losingPlayer.score >= 100):
+		# 	if state.getWinner().name == "Maddox":
+		# 		r = 1
 		s = np.zeros((2,n_s))[0:1]
 		trump = trick.suit.iden
 		max_trump = 0
@@ -160,7 +180,9 @@ class Maddox(Player):
 				max_min_list[3*i] = self.hand.hand[i][0].rank.rank
 				max_min_list[3*i + 1] = self.hand.hand[i][l//2].rank.rank
 				max_min_list[3*i + 2] = self.hand.hand[i][-1].rank.rank
-		s[0] = [trump, max_trump] + max_min_list
+
+		s[0] = [trump, max_trump] + max_min_list + [state.heartsBroken,
+		 											state.currentTrick.cardsInTrick]
 
 		Q1 = self.Q.run(Qout,feed_dict={inputs1:s})
 		# print(Q1)
@@ -169,37 +191,3 @@ class Maddox(Player):
 		targetQ[0,self.lastAction] = r + y*maxQ1
 		# print(y*maxQ1)
 		_,W1 = self.Q.run([updateModel,W],feed_dict={inputs1: s,nextQ:targetQ})
-
-# with tf.Session() as sess:
-#     sess.run(init)
-#     for i in range(num_episodes):
-#         #Reset environment and get first new observation
-#         s = env.reset()
-#         rAll = 0
-#         d = False
-#         j = 0
-#         #The Q-Network
-#         while j < 99:
-#             j+=1
-#             #Choose an action by greedily (with e chance of random action) from the Q-network
-#             a,allQ = sess.run([predict,Qout],feed_dict={inputs1:np.identity(16)[s:s+1]})
-#             if np.random.rand(1) < e:
-#                 a[0] = env.action_space.sample()
-#             #Get new state and reward from environment
-#             s1,r,d,_ = env.step(a[0])
-#             #Obtain the Q' values by feeding the new state through our network
-#             Q1 = sess.run(Qout,feed_dict={inputs1:np.identity(16)[s1:s1+1]})
-#             #Obtain maxQ' and set our target value for chosen action.
-#             maxQ1 = np.max(Q1)
-#             targetQ = allQ
-#             targetQ[0,a[0]] = r + y*maxQ1
-#             #Train our network using target and predicted Q values
-#             _,W1 = sess.run([updateModel,W],feed_dict={inputs1:np.identity(16)[s:s+1],nextQ:targetQ})
-#             rAll += r
-#             s = s1
-#             if d == True:
-#                 #Reduce chance of random action as we train the model.
-#                 e = 1./((i/50) + 10)
-#                 break
-#         jList.append(j)
-#         rList.append(rAll)
