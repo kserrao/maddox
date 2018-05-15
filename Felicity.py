@@ -5,7 +5,7 @@ from Rollouts import Rollouts
 from random import randint
 import math
 
-numIterations = 50
+numIterations = 25
 expansionDepth = 1
 clubs = 0
 diamonds = 1
@@ -51,10 +51,11 @@ class Felicity(Player):
 
     def runMCTS(self, state):
 		handArray = self.arrangeHand()
-		rootNode = Node(self.hand, state)
 
-		#print(self.hand.hand[trump.iden][0])
 		for i in range(0, numIterations):
+			print("size of Felicity's hand is: " + str(self.hand.size()))
+			rootNode = Node(self.hand, state)
+			print("RUNNING ITERATION " + str(i))
 			expanded = self.treePolicy(rootNode, handArray)
 			rollout = Rollouts(expanded.state, self, expanded)
 			# if Felicity won the simulated game, reward the selected node
@@ -77,7 +78,9 @@ class Felicity(Player):
 
     def treePolicy(self, rootNode, handArray):
 		thisNode = rootNode
-		while (thisNode.hand.size > 0 and thisNode.depth < expansionDepth):
+		print("the size of my NODE hand is now " + str(thisNode.hand.size()))
+		while (thisNode.hand.size() > 0 and thisNode.depth < expansionDepth):
+			print("entering the while loop w depth of " + str(thisNode.depth))
 			trump = thisNode.state.currentTrick.suit
 			size = thisNode.hand.size()
 			firstIndex = 0
@@ -137,8 +140,10 @@ class Felicity(Player):
 			r = randint(0,1)
 			if r:
 				thisNode = self.greedyChild(rootNode)
+				print("GREEDY choice is " + str(thisNode.card))
 			else:
 				thisNode = self.bestUCTChild(rootNode, 0.1)
+				print("UCT choice is " + str(thisNode.card))
 		return thisNode
 
     # uses a greedy heuristic to select which child to expand
@@ -194,6 +199,7 @@ class Felicity(Player):
     def expandTree(self, rootNode, handArray, i, firstIndex):
 		rootNode.createChild(rootNode.hand, rootNode.state)
 		rootNode.children[i].card = handArray[firstIndex + i]
+		print("NEW choice is" + str(rootNode.children[i].card))
 		rootNode.children[i].hand.removeCard(rootNode.children[i].card)
 		return rootNode.children[i]
 

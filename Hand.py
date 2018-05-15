@@ -47,14 +47,17 @@ class Hand:
 					self.spades, self.hearts]
 
 	def getRandomCard(self):
-		suit = randint(0,3)
-		suit = self.hand[suit]
-		while len(suit) == 0:
+		if self.size() > 0:
 			suit = randint(0,3)
 			suit = self.hand[suit]
-		index = randint(0, len(suit)-1)
+			while len(suit) == 0:
+				suit = randint(0,3)
+				suit = self.hand[suit]
+			index = randint(0, len(suit)-1)
 
-		return suit[index]
+			return suit[index]
+		else:
+			return None
 
 
 

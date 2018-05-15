@@ -49,7 +49,7 @@ class Rollouts:
 		self.players[2].hand = copy.deepcopy(state.players[2].hand)
 		self.players[2].score = copy.deepcopy(state.players[2].score)
 		self.players[2].roundScore = copy.deepcopy(state.players[2].roundScore)
-		self.players[2].tricksWon = state.players[2].tricksWon
+		self.players[2].tricksWon = copy.deepcopy(state.players[2].tricksWon)
 
 		self.players[3].hand = copy.deepcopy(state.players[3].hand)
 		self.players[3].score = copy.deepcopy(state.players[3].score)
@@ -117,6 +117,7 @@ class Rollouts:
 	def roundSimScore(self, rollout):
 		for p in rollout.players:
 			p.score += p.roundScore
+			p.roundScore = 0
 
 
 	def playSimTrick(self, start, rollout):

@@ -3,7 +3,7 @@ from Card import Card, Suit, Rank
 from Player import Player
 from Trick import Trick
 from random import randint
-from Maddox import Maddox
+#from Maddox import Maddox
 from Felicity import Felicity
 from Hand import Hand
 from Dumb import Dumb
@@ -25,7 +25,7 @@ hearts = 3
 cardsToPass = 3
 
 class Hearts:
-	def __init__(self, felicity, maddox):
+	def __init__(self, felicity):
 
 		self.roundNum = 0
 		self.trickNum = 0 # initialization value such that first round is round 0
@@ -39,7 +39,7 @@ class Hearts:
 
 
 		# Make four players
-		self.players = [felicity, maddox, Dumb("Dumb"), Dumb("Dumber")]
+		self.players = [felicity, Dumb("Dumbest"), Dumb("Dumb"), Dumb("Dumber")]
 
 		#initialize Felicity
 		self.players[0].hand = Hand()
@@ -48,10 +48,10 @@ class Hearts:
 		self.players[0].tricksWon = []
 
 		#initialize Maddox
-		self.players[1].hand = Hand()
-		self.players[1].score = 0
-		self.players[1].roundScore = 0
-		self.players[1].tricksWon = []
+		#self.players[1].hand = Hand()
+		#self.players[1].score = 0
+		#self.players[1].roundScore = 0
+		#self.players[1].tricksWon = []
 
 		'''
 		Player physical locations:
@@ -123,6 +123,7 @@ class Hearts:
 				self.shootTheMoon(p)
 			else:
 				p.score += p.roundScore
+				p.roundScore = 0
 			# if p.name == "Maddox":
 			# 	p.eval(self)
 
@@ -298,17 +299,18 @@ class Hearts:
 			if p.score < minScore:
 				winner = p
 				minScore = p.score
+		print("REAL WINNER IS " + winner.name + str(winner.score))
 		return winner
 
 
 
 
 def main():
-	wins = {"Felicity" : 0, "Dumb" : 0, "Dumber" : 0, "Maddox" : 0}
+	wins = {"Felicity" : 0, "Dumb" : 0, "Dumber" : 0, "Dumbest" : 0}
 	felicity = Felicity("")
-	maddox = Maddox("")
+	#maddox = Maddox("")
 	for i in range(200):
-		hearts = Hearts(felicity, maddox)
+		hearts = Hearts(felicity)
 
         # play until someone loses
 		while hearts.losingPlayer is None or hearts.losingPlayer.score < maxScore:
@@ -332,7 +334,7 @@ def main():
 		# print(maddox.tricksplayed)
 		if (i % 10 == 9):
 			print("\n")
-			print("Maddox: " + str(wins["Maddox"]) + "\nFelicity: " + str(wins["Felicity"]) + "\nDumb: " + str(wins["Dumb"]) + "\nDumber: " + str(wins["Dumber"]))
+			print("Dumbest: " + str(wins["Dumbest"]) + "\nFelicity: " + str(wins["Felicity"]) + "\nDumb: " + str(wins["Dumb"]) + "\nDumber: " + str(wins["Dumber"]))
 
 if __name__ == '__main__':
 	main()
