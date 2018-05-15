@@ -14,14 +14,14 @@ hearts = 3
 suits = ["c", "d", "s", "h"]
 
 class Felicity(Player):
-    def __init__(self, name):
-        self.name = "Felicity"
-        self.hand = Hand()
-        self.score = 0
-        self.roundScore = 0
-        self.tricksWon = []
+	def __init__(self, name):
+		self.name = "Felicity"
+		self.hand = Hand()
+		self.score = 0
+		self.roundScore = 0
+		self.tricksWon = []
 
-    def play(self, option='play', c=None, auto=False, state=None):
+	def play(self, option='play', c=None, auto=False, state=None):
 		if not c is None:
 			return self.hand.playCard(c)
 
@@ -49,7 +49,7 @@ class Felicity(Player):
 		else:
 			return self.hand.getRandomCard()
 
-    def runMCTS(self, state):
+	def runMCTS(self, state):
 		handArray = self.arrangeHand()
 
 		for i in range(0, numIterations):
@@ -69,14 +69,14 @@ class Felicity(Player):
 		card = bestChild.card
 		return card
 
-    def arrangeHand(self):
+	def arrangeHand(self):
 		handArray = []
 		for suit in self.hand.hand:
 			for card in suit:
 				handArray.append(card)
 		return handArray
 
-    def treePolicy(self, rootNode, handArray):
+	def treePolicy(self, rootNode, handArray):
 		thisNode = rootNode
 		print("the size of my NODE hand is now " + str(thisNode.hand.size()))
 		while (thisNode.hand.size() > 0 and thisNode.depth < expansionDepth):
@@ -147,7 +147,7 @@ class Felicity(Player):
 		return thisNode
 
     # uses a greedy heuristic to select which child to expand
-    def greedyChild(self, rootNode):
+	def greedyChild(self, rootNode):
 		trump = rootNode.state.currentTrick.suit
 		# if this is the first move, return our lowest card
 		if trump.iden == -1:
@@ -180,7 +180,7 @@ class Felicity(Player):
 					return self.highestCard(rootNode)
 
 	# uses the UCT function to select the statistically best child to visit
-    def bestUCTChild(self, rootNode, weight):
+	def bestUCTChild(self, rootNode, weight):
 		bestIndex = 0
 		bestVal = -999999 #impossibly low
 		totalVisits = rootNode.visits
@@ -196,7 +196,7 @@ class Felicity(Player):
 		return rootNode.children[bestIndex]
 
 	# create a child for the root node corresponding to a valid move(card to play)
-    def expandTree(self, rootNode, handArray, i, firstIndex):
+	def expandTree(self, rootNode, handArray, i, firstIndex):
 		rootNode.createChild(rootNode.hand, rootNode.state)
 		rootNode.children[i].card = handArray[firstIndex + i]
 		print("NEW choice is" + str(rootNode.children[i].card))
@@ -204,14 +204,14 @@ class Felicity(Player):
 		return rootNode.children[i]
 
 	# propogate the simulated reward back up the tree
-    def backPropogate(self, baseNode, reward):
+	def backPropogate(self, baseNode, reward):
 		node = baseNode
 		while not node is None:
 			node.updateCounter(reward)
 			node = node.parent
 
 	# pick the child of the root node with the highest win/visit ratio
-    def bestRewardChild(self, rootNode):
+	def bestRewardChild(self, rootNode):
 		highestReward = -999999; #impossibly low
 		bestChildIndex = 0;
 		for i in range(0, len(rootNode.children)):
@@ -222,7 +222,7 @@ class Felicity(Player):
 					bestChildIndex = i
 		return bestChildIndex
 
-    def highestCard(self, rootNode):
+	def highestCard(self, rootNode):
 		high = rootNode.children[0]
 		for i in range(1, len(rootNode.children)):
 			if rootNode.children[i].card.rank.rank > high.card.rank.rank:
@@ -230,7 +230,7 @@ class Felicity(Player):
 		return high
 
 	# GREEDY ALG: returns the node corresponding to our lowest legal card
-    def lowestCard(self, rootNode):
+	def lowestCard(self, rootNode):
 		low = rootNode.children[0]
 		for i in range(1, len(rootNode.children)):
 			if rootNode.children[i].card.rank.rank < low.card.rank.rank:
@@ -238,10 +238,10 @@ class Felicity(Player):
 		return low
 
 	# GREEDY ALG: returns the node corresponding to the lowest legal card of a given suit
-    def lowestInSuit(self, rootNode, suit):
+	def lowestInSuit(self, rootNode, suit):
 		return rootNode.hand.hand[suit.iden][0]
 
 	# GREEDY ALG: returns the node corresponding to the highest legal card of a given suit
-    def highestHeart(self, rootNode):
+	def highestHeart(self, rootNode):
 		lastIndex = len(rootNode.hand.hearts) - 1
 		return rootNode.hand.hearts[lastIndex]
