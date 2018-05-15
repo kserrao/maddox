@@ -115,6 +115,7 @@ class Hearts:
 				self.shootTheMoon(p)
 			else:
 				p.score += p.roundScore
+				p.roundScore = 0
 			# if p.name == "Maddox":
 			# 	p.eval(self)
 

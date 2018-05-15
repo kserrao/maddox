@@ -97,11 +97,23 @@ class Maddox(Player):
 				if self.hand.spades[i].rank.rank == 12:
 					index = i
 		# if (self.tricksplayed > 30000):
-		# print(trump)
-		# print(max_trump)
-		# print(a[0])
-		# print(max_min_list)
-		# print(allQ)
+		suitlist = ["clubs", "diamonds", "spades", "hearts", "unset"]
+		print("trump suit is " + suitlist[trump])
+		print("highest of trump suit is " + str(max_trump))
+		print("min/med/max of clubs:")
+		print(max_min_list[:3])
+		print("min/med/max of diamonds:")
+		print(max_min_list[3:6])
+		print("min/med/max of spades:")
+		print(max_min_list[6:9])
+		print("min/med/max of hearts:")
+		print(max_min_list[9:])
+		print("Q-values:")
+		print(allQ)
+		if a[0] == 12:
+			print("Maddox plays the Queen of Spades")
+		else:
+			print("Maddox plays the " + str(max_min_list[a[0]]) + " of " + suitlist[a[0] // 3])
 		rep = False
 		while np.random.rand(1) < e or len(self.hand.hand[suit]) == 0 or rep:
 			a[0] = random.randint(0,n_a - 1)
