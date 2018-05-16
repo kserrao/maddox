@@ -1,8 +1,8 @@
-from Hand import Hand
+import copy
+
 class Node():
 	def __init__(self, hand, state, parent=None):
-		self.hand = Hand()
-		self.copyHand(hand, self.hand)
+		self.hand = copy.deepcopy(hand)
 		self.visits = 1.0
 		self.wins = 0.0
 		self.children = []
@@ -17,11 +17,6 @@ class Node():
 		else:
 			self.card = parent.card
 
-	def copyHand(self, hand1, hand2):
-		for x in dir(hand1):
-			if x[:2] != "__":
-				setattr(hand2, x, getattr(hand1, x))
-
 	def createChild(self, hand, child_state):
 		child = Node(hand, child_state, self)
 		self.children.append(child)
@@ -33,3 +28,4 @@ class Node():
 
 	def getReward(self):
 		return self.wins/self.visits
+
